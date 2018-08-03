@@ -54,7 +54,6 @@ private:
 
     size_t count_positive = 0;    /// The number of positive rows for the current primary key.
     size_t count_negative = 0;    /// The number of negative rows for the current primary key.
-    bool last_is_positive = false;  /// true if the last row for the current primary key is positive.
 
     size_t count_incorrect_data = 0;    /// To prevent too many error messages from writing to the log.
 
@@ -74,7 +73,7 @@ private:
     void merge(MutableColumns & merged_columns, std::priority_queue<SortCursor> & queue);
 
     /// Output to result rows for the current primary key.
-    void insertRows(MutableColumns & merged_columns, size_t & merged_rows, bool last_in_stream = false);
+    void insertRows(MutableColumns & merged_columns, size_t & merged_rows);
 
     void reportIncorrectData();
 };

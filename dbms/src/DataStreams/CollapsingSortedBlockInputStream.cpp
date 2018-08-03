@@ -40,31 +40,11 @@ void CollapsingSortedBlockInputStream::reportIncorrectData()
 }
 
 
-void CollapsingSortedBlockInputStream::insertRows(MutableColumns & merged_columns, size_t & merged_rows, bool last_in_stream)
+void CollapsingSortedBlockInputStream::insertRows(MutableColumns & merged_columns, size_t & merged_rows)
 {
-    if (count_positive == 0 && count_negative == 0)
-        return;
-
-    if (count_positive == count_negative && !last_is_positive)
+    if (count_positive == count_negative)
     {
-        /// If all the rows in the input streams was collapsed, we still want to give at least one block in the result.
-        if (last_in_stream && merged_rows == 0 && !blocks_written)
-        {
-            LOG_INFO(log, "All rows collapsed");
-            ++merged_rows;
-            for (size_t i = 0; i < num_columns; ++i)
-                merged_columns[i]->insertFrom(*(*last_positive.columns)[i], last_positive.row_num);
-            ++merged_rows;
-            for (size_t i = 0; i < num_columns; ++i)
-                merged_columns[i]->insertFrom(*(*last_negative.columns)[i], last_negative.row_num);
-
-            if (out_row_sources_buf)
-            {
-                /// true flag value means "skip row"
-                current_row_sources[last_positive_pos].setSkipFlag(false);
-                current_row_sources[last_negative_pos].setSkipFlag(false);
-            }
-        }
+        return;
     }
     else
     {
@@ -172,7 +152,6 @@ void CollapsingSortedBlockInputStream::merge(MutableColumns & merged_columns, st
         if (sign == 1)
         {
             ++count_positive;
-            last_is_positive = true;
 
             setRowRef(last_positive, current);
             last_positive_pos = current_pos;
@@ -192,7 +171,6 @@ void CollapsingSortedBlockInputStream::merge(MutableColumns & merged_columns, st
             }
 
             ++count_negative;
-            last_is_positive = false;
         }
         else
             throw Exception("Incorrect data: Sign = " + toString(sign) + " (must be 1 or -1).",
@@ -211,7 +189,7 @@ void CollapsingSortedBlockInputStream::merge(MutableColumns & merged_columns, st
     }
 
     /// Write data for last primary key.
-    insertRows(merged_columns, merged_rows, true);
+    insertRows(merged_columns, merged_rows);
 
     finished = true;
 }
