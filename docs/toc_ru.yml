@@ -1,4 +1,4 @@
-pages:
+nav:
 
 - 'Введение':
   - 'Обзор': 'index.md'
@@ -31,6 +31,7 @@ pages:
   - 'Введение': 'data_types/index.md'
   - 'UInt8, UInt16, UInt32, UInt64, Int8, Int16, Int32, Int64': 'data_types/int_uint.md'
   - 'Float32, Float64': 'data_types/float.md'
+  - 'Decimal': 'data_types/decimal.md'
   - 'Булевы значения': 'data_types/boolean.md'
   - 'String': 'data_types/string.md'
   - 'FixedString(N)': 'data_types/fixedstring.md'
@@ -113,7 +114,6 @@ pages:
   - 'Операторы': 'query_language/operators.md'
   - 'Общий синтаксис': 'query_language/syntax.md'
 
-
 - 'Эксплуатация':
   - 'hidden': 'operations/index.md'
   - 'Движки таблиц':
@@ -170,11 +170,13 @@ pages:
 
 - 'Разработка':
   - 'hidden': 'development/index.md'
-  - 'Overview of ClickHouse architecture': 'development/architecture.md'
+  - 'Обзор архитектуры ClickHouse': 'development/architecture.md'
   - 'Как собрать ClickHouse на Linux': 'development/build.md'
   - 'Как собрать ClickHouse на Mac OS X': 'development/build_osx.md'
   - 'Как писать код на C++': 'development/style.md'
   - 'Как запустить тесты': 'development/tests.md'
 
-- 'Roadmap': 'roadmap.md'
-- 'Changelog': 'changelog.md'
+- 'Что нового':
+  - 'Changelog': 'changelog.md'
+  - 'Security changelog': 'security_changelog.md'
+  - 'Roadmap': 'roadmap.md'

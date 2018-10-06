@@ -77,17 +77,17 @@ ORDER BY PageViews DESC LIMIT 1000
 
 در این مثال، query بر روی 0.1 (10 درصد) از داده ها اجرا می شود. مقادیر توابع aggregate به صورت اتوماتیک اصلاح نمی شوند، پس برای دستیابی به یک نتیجه ی تقریبی، مقدار 'count()' به صورت دستی 10 برابر می شود.
 
-When using something like `SAMPLE 10000000`, there isn't any information about which relative percent of data was processed or what the aggregate functions should be multiplied by, so this method of writing is not always appropriate to the situation.
+هنگام استفاده از چیزی شبیه به `SAMPLE 10000000`، هیچ اطلاعاتی در مورد درصد نسبی از داده های پردازش شده یا توابع aggregate که باید به چند برابر شوند وجود ندارد، بنابراین همیشه این روش نوشتن مناسب نیست. 
 
-A sample with a relative coefficient is "consistent": if we look at all possible data that could be in the table, a sample (when using a single sampling expression specified during table creation) with the same coefficient always selects the same subset of possible data. In other words, a sample from different tables on different servers at different times is made the same way.
+یک نمونه با ضریب نسبی "consistent" است: اگر ما نگاهی به تمام داده های احتمالی را که می توان در جدول قرار داد بیندازیم،  (هنگام استفاده از یک فرمول نمونه گیری مشخص در طی ایجاد جدول)  با ضریب مشابه همیشه زیرمجموعه ای از داده های ممکن را انتخاب می کند. به عبارت دیگر یک نمونه از جداول مختلف در سرور های مختلف و در زمان های مختلف به همان شیوه ساخته می شود.
 
 For example, a sample of user IDs takes rows with the same subset of all the possible user IDs from different tables. This allows using the sample in subqueries in the IN clause, as well as for manually correlating results of different queries with samples.
 
-### ARRAY JOIN clause
+### دستور ARRAY JOIN
 
-Allows executing JOIN with an array or nested data structure. The intent is similar to the 'arrayJoin' function, but its functionality is broader.
+اجازه ی اجرای JOIN با یک آرایه یا با یک nested data structure را می دهد. هدف این دستور شبیه به تابع 'arrayJoin' می باشد، اما قابلیت آن گسترده تر است.
 
-`ARRAY JOIN` is essentially `INNER JOIN` with an array. Example:
+`ARRAY JOIN` اساسا همان `INNER JOIN` با استفاده از آرایه است. مثال:
 
 </div>
 
@@ -142,7 +142,11 @@ ARRAY JOIN arr
 5 rows in set. Elapsed: 0.001 sec.
 ```
 
-An alias can be specified for an array in the ARRAY JOIN clause. In this case, an array item can be accessed by this alias, but the array itself by the original name. Example:
+<div dir="rtl">
+
+نام alias می تواند برای یک آرایه در یک ARRAY JOIN استفاده شود. در این مورد، آیتم های آرایه می تواند از طریق alias قابل دسترسی باشند، اما خود آرایه با استفاده از نام اصلیش. مثال: 
+
+</div>
 
 ```text
 :) SELECT s, arr, a FROM arrays_test ARRAY JOIN arr AS a
@@ -162,7 +166,11 @@ ARRAY JOIN arr AS a
 5 rows in set. Elapsed: 0.001 sec.
 ```
 
-Multiple arrays of the same size can be comma-separated in the ARRAY JOIN clause. In this case, JOIN is performed with them simultaneously (the direct sum, not the direct product). Example:
+<div dir="rtl">
+
+چندین آرایه با سایز یکسان می توانند به صورت comma-separated در ARRAY JOIN قرار بگیرند. در این مورد، JOIN به طور همزمان با آنها انجام می شود  (the direct sum, not the direct product). مثال:
+
+</div>
 
 ```text
 :) SELECT s, arr, a, num, mapped FROM arrays_test ARRAY JOIN arr AS a, arrayEnumerate(arr) AS num, arrayMap(x -> x + 1, arr) AS mapped
@@ -198,7 +206,11 @@ ARRAY JOIN arr AS a, arrayEnumerate(arr) AS num
 5 rows in set. Elapsed: 0.002 sec.
 ```
 
-ARRAY JOIN also works with nested data structures. Example:
+<div dir="rtl">
+
+همچنین دستور ARRAY JOIN در nested data structure کار می کند. مثال:
+
+</div>
 
 ```text
 :) CREATE TABLE nested_test (s String, nest Nested(x UInt8, y UInt32)) ENGINE = Memory
@@ -253,7 +265,11 @@ ARRAY JOIN nest
 5 rows in set. Elapsed: 0.001 sec.
 ```
 
-When specifying names of nested data structures in ARRAY JOIN, the meaning is the same as ARRAY JOIN with all the array elements that it consists of. Example:
+<div dir="rtl">
+
+زمانی که در ARRAY JOIN برای nested data structure اسم می گذاریم، معنای همان ARRAY JOIN با تمام element های آرایه که از آن تشکیل شده است می دهد. مثال:
+
+</div>
 
 ```text
 :) SELECT s, nest.x, nest.y FROM nested_test ARRAY JOIN nest.x, nest.y
@@ -273,7 +289,11 @@ ARRAY JOIN `nest.x`, `nest.y`
 5 rows in set. Elapsed: 0.001 sec.
 ```
 
-This variation also makes sense:
+<div dir="rtl">
+
+این تنوع همجنین احساس می شود:
+
+</div>
 
 ```text
 :) SELECT s, nest.x, nest.y FROM nested_test ARRAY JOIN nest.x
@@ -293,7 +313,11 @@ ARRAY JOIN `nest.x`
 5 rows in set. Elapsed: 0.001 sec.
 ```
 
-An alias may be used for a nested data structure, in order to select either the JOIN result or the source array. Example:
+<div dir="rtl">
+
+برای انتخاب نتایج JOIN و یا source array از اسم alias می توان در nested data structure استفاده کرد.
+
+</div>
 
 ```text
 :) SELECT s, n.x, n.y, nest.x, nest.y FROM nested_test ARRAY JOIN nest AS n
@@ -313,7 +337,11 @@ ARRAY JOIN nest AS n
 5 rows in set. Elapsed: 0.001 sec.
 ```
 
-Example of using the arrayEnumerate function:
+<div dir="rtl">
+
+مثالی از استفاده از تابع arrayEnumerate:
+
+</div>
 
 ```text
 :) SELECT s, n.x, n.y, nest.x, nest.y, num FROM nested_test ARRAY JOIN nest AS n, arrayEnumerate(nest.x) AS num
@@ -333,48 +361,54 @@ ARRAY JOIN nest AS n, arrayEnumerate(`nest.x`) AS num
 5 rows in set. Elapsed: 0.002 sec.
 ```
 
-The query can only specify a single ARRAY JOIN clause.
+<div dir="rtl">
 
-The corresponding conversion can be performed before the WHERE/PREWHERE clause (if its result is needed in this clause), or after completing WHERE/PREWHERE (to reduce the volume of calculations).
+query فقط می تواند یک ARRAY JOIN مشخص کند.
+
+تبدیل مربوطه می تواند قبل از دستورات WHERE/PREWHERE (اگر نتیجه ی آن در این دستور نیاز باشد)، یا بعد از تکیل WHERE/PREWHERE انجام شود (برای کاهش حجم محاسبات).
 
 ### JOIN clause
 
-The normal JOIN, which is not related to ARRAY JOIN described above.
+JOIN عادی، که به ARRAY JOIN که در بالا توضیح داده شده است مرتبط نیست.
+
+</div>
 
 ```sql
 [GLOBAL] ANY|ALL INNER|LEFT [OUTER] JOIN (subquery)|table USING columns_list
 ```
 
-Performs joins with data from the subquery. At the beginning of query processing, the subquery specified after JOIN is run, and its result is saved in memory. Then it is read from the "left" table specified in the FROM clause, and while it is being read, for each of the read rows from the "left" table, rows are selected from the subquery results table (the "right" table) that meet the condition for matching the values of the columns specified in USING.
+<div dir="rtl">
 
-The table name can be specified instead of a subquery. This is equivalent to the `SELECT * FROM table` subquery, except in a special case when the table has the Join engine – an array prepared for joining.
+در ابتدای پردازش query، subquery که بعد از join مشخص شده اجرا می شود و نتایج آن در memory قرار می گیرد. سپس از جدول سمت "چپ" که در FROM مشخص شده، در هنگام خواندن سطرهای آن، به ازای هر یک از سطرهای خوانده شده از جدول سمت چپ، سطرهایی که از نتایج subquery جدول راست به دست آمده اند و شرطهای مشخص شده بعد از USING را دارند انتخاب می شوند و در خروجی نمایش داده می شوند.
 
-All columns that are not needed for the JOIN are deleted from the subquery.
+نام یک جدول به جای یک subquery در join می تواند قرار گیرد. این کار به استثنا موارد خاص که جدول از موتور Join استفاده می کند، معادل `SELECT * FROM table` می باشد.
 
-There are several types of JOINs:
+همه ی ستون هایی که در هنگام JOIN نیاز نیستند از subquery حذف می شوند.
 
-`INNER` or `LEFT` type:If INNER is specified, the result will contain only those rows that have a matching row in the right table.
-If LEFT is specified, any rows in the left table that don't have matching rows in the right table will be assigned the default value - zeros or empty rows. LEFT OUTER may be written instead of LEFT; the word OUTER does not affect anything.
+چندین نوع از JOIN های وجود دارد:
 
-`ANY` or `ALL` stringency:If `ANY` is specified and the right table has several matching rows, only the first one found is joined.
-If `ALL` is specified and the right table has several matching rows, the data will be multiplied by the number of these rows.
+`INNER` یا `LEFT`: اگر از INNER استفاده شود، نتیجه ی query فقط شامل سطرهایی می شود که سطر مطابق در جدول راست دارند.
+اگر از LEFT استفاده شود، هر سطری از جدول چپ که با جدول راستی مطابقت ندارد در خروجی حاضر می شود اما با مقدار پیش فرض zeros یا empty پر می شود. به جای LEFT ممکن است LEFT OUTER نوشته شود که کلمه ی OUTER تاثیری در خروجی ندارد.
 
-Using ALL corresponds to the normal JOIN semantic from standard SQL.
-Using ANY is optimal. If the right table has only one matching row, the results of ANY and ALL are the same. You must specify either ANY or ALL (neither of them is selected by default).
+`ANY` یا `ALL`: اگر از `ANY` استفاده شود و جدول راست چندین سطر یکسان، مطابق با جدول چپ داشته باشد، فقط اولین سطر مطابق join می شود. اگر از `ALL` استفاده شود و جدول سمت راست چندین ستون یکسان، مطابق با جدول چپ داشته باشد، همه ی آنها در خروجی نمایش داده می شوند.
+
+استفاده از ALL مطابق با JOIN عادی در SQL استاندارد می باشد. استفاده از ANY بهینه است. اگر جدول سمت راست فقط یک سطر مطابق داشته باشد، خروجی ANY و ALL یکسان خواهد بود. شما باید ANY یا ALL را انتخاب کنید (هیچکدام به صورت پیش فرض انتخاب نمی شوند).
 
 `GLOBAL` distribution:
 
-When using a normal JOIN, the query is sent to remote servers. Subqueries are run on each of them in order to make the right table, and the join is performed with this table. In other words, the right table is formed on each server separately.
+در هنگام استفاده از JOIN عادی، query به سرور های remote ارسال می شود. subquery ها به ترتیب در هر یک از آنها برای ساخت جدول راست اجرا می شوند، و join با این جدول به دست آمده انجام می شود. به باید دیگر جدول راست در هر یک از سرور ها به صورت جداگانه شکل می گیرد.
 
-When using `GLOBAL ... JOIN`, first the requestor server runs a subquery to calculate the right table. This temporary table is passed to each remote server, and queries are run on them using the temporary data that was transmitted.
+هنگام استفاده از `GLOBAL ... JOIN`، اولین سرور، subquery رو برای محاسبه جدول راست اجرا می کند. این جدول موقت به هر یک از سرور های remote پاس داده می شود، و query ها روی همان جدول موقت با داده هایی که منتقل شده اند اجرا می شود.
 
-Be careful when using GLOBAL JOINs. For more information, see the section "Distributed subqueries".
+در هنگام استفاده از GLOBAL JOIN ها دقت کنید. برای اطلاعات بیشتر، بخش "Distributed subqueries" را ببینید.
 
-Any combination of JOINs is possible. For example, `GLOBAL ANY LEFT OUTER JOIN`.
+هر ترکیبی از JOIN ها ممکن است. برای مثال: `GLOBAL ANY LEFT OUTER JOIN`.
 
-When running a JOIN, there is no optimization of the order of execution in relation to other stages of the query. The join (a search in the right table) is run before filtering in WHERE and before aggregation. In order to explicitly set the processing order, we recommend running a JOIN subquery with a subquery.
+در هنگام اجرای یک JOIN، هیچ بهینه سازی در ارتباط با ترتیب اجرا به سایر مراحل وجود ندارد. join (جستجو در جدول سمت راست) قبل از WHERE و قبل از aggregation اجرا می شود. توصیه می کنیم در هنگام استفاده از join از subquery استفاده کنید.
 
-Example:
+مثال:
+
+</div>
 
 ```sql
 SELECT
@@ -415,45 +449,47 @@ LIMIT 10
 └───────────┴────────┴────────┘
 ```
 
-Subqueries don't allow you to set names or use them for referencing a column from a specific subquery.
-The columns specified in USING must have the same names in both subqueries, and the other columns must be named differently. You can use aliases to change the names of columns in subqueries (the example uses the aliases 'hits' and 'visits').
+<div dir="rtl">
 
-The USING clause specifies one or more columns to join, which establishes the equality of these columns. The list of columns is set without brackets. More complex join conditions are not supported.
+subquery ها به شما اجازه ی تنظیم اسامی یا استفاده از آنها برای refrence دادن به ستون مشخص دیگر را نمی دهند. ستون های مشخص شده در USING باید در هر دو subquery یکسان باشند، و دیگر ستون ها باید نام متفاوتی داشته باشند. شما می توانید از اسم alias برای تغییر اسم ستون های subquery ها استفاده کنید (مثلا استفاده از اسم 'hits' و 'visits').
 
-The right table (the subquery result) resides in RAM. If there isn't enough memory, you can't run a JOIN.
+دستور USING یک یا چند ستون را برای join مشخص می کند، که شرط برابری ستون های را برقرار می کند. این لیست از ستون ها بدون براکت ست می شوند. دیگر شرطهای پیچیده ی join پشتیبانی نمی شوند.
 
-Only one JOIN can be specified in a query (on a single level). To run multiple JOINs, you can put them in subqueries.
+جدول راست (نتیجه ی subquery) در RAM نگه داری می شود. اگر memory به اندازه کافی موجود نباشد، شما نمی توان JOIN را اجرا کنید.
 
-Each time a query is run with the same JOIN, the subquery is run again – the result is not cached. To avoid this, use the special 'Join' table engine, which is a prepared array for joining that is always in RAM. For more information, see the section "Table engines, Join".
+یک JOIN فقط می توانید در یک query مشخص شود. برای اجرای چندین JOIN، باید آنها رو در subquery ها قرار بدید.
 
-In some cases, it is more efficient to use IN instead of JOIN.
-Among the various types of JOINs, the most efficient is ANY LEFT JOIN, then ANY INNER JOIN. The least efficient are ALL LEFT JOIN and ALL INNER JOIN.
+هر بار که یک query با JOIN یکسان اجرا می شود، subquery مجددا اجرا می شود - نتایج JOIN کش نمی شوند. برای جلوگیری از آن از موتور جدول ویژه ی 'Join' استفاده کنید، که آرایه ی آماده برای JOIN را همیشه در RAM دارد. برای اطلاعات بیشتر بخش "موتور های جدول، موتور Join" را ببینید.
 
-If you need a JOIN for joining with dimension tables (these are relatively small tables that contain dimension properties, such as names for advertising campaigns), a JOIN might not be very convenient due to the bulky syntax and the fact that the right table is re-accessed for every query. For such cases, there is an "external dictionaries" feature that you should use instead of JOIN. For more information, see the section "External dictionaries".
+در بعضی موارد، استفاده از IN به جای JOIN کارآمدتر است. در میان انواع مختلف JOIN ها، کارآمدترین آن ANY LEFT JOIN و ANY INNER JOIN می باشد. کمترین کارآمد ALL LEFT JOIN و ALL INNER JOIN می باشد.
 
-### WHERE clause
+اگر شما نیاز به JOIN برای join زدن با جداول dimension دارید (این جداول نسبتا کوچک هستند و شامل پروپرتی های dimension، مثل نام برای کمپین های تبلیغاتی می باشند)، JOIN ممکن است به دلیل سینتکس bulky و این واقعیت که جدول راست برای هر query قابل دسترسی است، خیلی راحت نباشد. برای بعضی موارد، باید از ویژگی "external dictionaries" به جای JOIN استفاده کنید. برای اطلاعات بیشتر بخش "External dictionaries" را ببینید.
 
-If there is a WHERE clause, it must contain an expression with the UInt8 type. This is usually an expression with comparison and logical operators.
-This expression will be used for filtering data before all other transformations.
+با تنظیم join_use_nulls، رفتار JOIN تحت تاثیر قرار می گیرد. در صورت تنظیم `join_use_nulls=1`، دستور JOIN مشابه SQL استاندارد کار خواهد کرد.
 
-If indexes are supported by the database table engine, the expression is evaluated on the ability to use indexes.
+اگر کلید های JOIN فیلد های Nullable باشند، سطرهایی که حداقل یکی از کلید های آن دارای مقدار Null باشند، join نمیشوند.
 
-### PREWHERE clause
+### دستور WHERE
 
-This clause has the same meaning as the WHERE clause. The difference is in which data is read from the table.
-When using PREWHERE, first only the columns necessary for executing PREWHERE are read. Then the other columns are read that are needed for running the query, but only those blocks where the PREWHERE expression is true.
+اگر دستور WHERE استفاده شود، باید حاوی شرطی با نوع Uint8 باشد. معمولا این شرط از نوع مقایسه و اپراتورهای منطقی می باشد. از شرط برای فیلتر کردن دیتا قبل از انتقال آنها استفاده می شود.
 
-It makes sense to use PREWHERE if there are filtration conditions that are not suitable for indexes that are used by a minority of the columns in the query, but that provide strong data filtration. This reduces the volume of data to read.
+اگر ایندکس توسط موتور جدول پشتیبانی شود، شرط توانایی استفاده از ایندکس را دارا خواهد بود.
 
-For example, it is useful to write PREWHERE for queries that extract a large number of columns, but that only have filtration for a few columns.
+### دستور PREWHERE
 
-PREWHERE is only supported by tables from the `*MergeTree` family.
+این دستور هم معنی دستور WHERE می باشد. تفاوت آنها فقط در این است که کدام یک از دیتا باید از جدول خوانده شود. در هنگام استفاده از PREWHERE، در ابتدا ستون هایی که برای اجرای PREWHERE واجب هستند خوانده می شوند. سپس بقیه ستون هایی که برای اجرای query نیاز هستند خوانده می شوند. البته به شرطی این ستون ها خوانده می شوند که شرط PREWHERE را دارا باشند.
 
-A query may simultaneously specify PREWHERE and WHERE. In this case, PREWHERE precedes WHERE.
+اگر شرط فیلتر کردنی وجود دارد که مناسب برای index نیست و توسط ستون های کمی در query استفاده می شود اما یک فیلتر قوی روی داده ها اعمال می کند، در این شرایط استفاده از PREWHERE مناسب است. این باعث کاهش حجم خواندن داده ها می شود.
 
-Keep in mind that it does not make much sense for PREWHERE to only specify those columns that have an index, because when using an index, only the data blocks that match the index are read.
+برای مثال، برای query هایی که تعداد زیادی ستون extract می کنن اما فقط روی چند ستون عملیات فیلترینگ دارند، نوشتن PREWHERE مناسب است.
 
-If the 'optimize_move_to_prewhere' setting is set to 1 and PREWHERE is omitted, the system uses heuristics to automatically move parts of expressions from WHERE to PREWHERE.
+PREWHERE فقط در جداول با موتور `MergeTree*` پشتیبانی می شود.
+
+یک query می تواند همزمان هم PREWHEER و هم WHERE داشته باشد اما ابتدا PREWHERE اجرا می شود.
+
+به یاد داشته باشید که استفاده از PREWHERE در ستون هایی که دارای ایندکس هستند چندان پراهمیت نیست، چون در هنگام استفاده از ایندکس، فقط بلوک داده هایی که مطابق با ایندکس هستند خوانده می شوند.
+
+اگر 'optimize_move_to_prewhere' برابر با 1 باشد و از PREWHERE استفاده نشود، سیستم به صورت اتوماتیک بخشی از دستورات WHERE رو به PREWHERE منتقل می کند.
 
 ### GROUP BY clause
 
@@ -465,6 +501,8 @@ All the expressions in the SELECT, HAVING, and ORDER BY clauses must be calculat
 If a query contains only table columns inside aggregate functions, the GROUP BY clause can be omitted, and aggregation by an empty set of keys is assumed.
 
 Example:
+
+</div>
 
 ```sql
 SELECT
